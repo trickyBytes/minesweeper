@@ -15,7 +15,7 @@ class Board {
     }
 
     fun revealPosition(position: Position) = position
-        .apply { log.trace("Revealing position {}", position) }
+        .apply { log.debug("Revealing position {}", position) }
         .run {
             when (hasMine(this, this@Board.grid)) {
                 true -> GameState.LOST

@@ -118,7 +118,7 @@ class MinesweeperApplicationTests {
 
         var gamesToPlay = 1
         while (gamesToPlay <= 20) {
-            var boardToPlay = Board(3, 2)
+            var boardToPlay = Board(3, 1)
             var gameState = GameState.IN_PROGRESS
             var movesMade = 0
 
@@ -126,8 +126,10 @@ class MinesweeperApplicationTests {
                 .shuffled()
                 .forEach {
                     if (gameState === GameState.IN_PROGRESS)
-                        movesMade++
-                        gameState = boardToPlay.revealPosition(it)
+                        if(!Board.isRevealed(it, boardToPlay.grid)) {
+                            gameState = boardToPlay.revealPosition(it)
+                            movesMade++
+                        }
                 }
             log.info("Game no {} Moves Made {}, Game State {}", gamesToPlay, movesMade, gameState)
             gamesToPlay++
