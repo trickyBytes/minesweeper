@@ -1,5 +1,6 @@
 package com.example.minesweeper
 
+import com.example.minesweeper.Board.Companion.addMines
 import org.slf4j.LoggerFactory
 
 class Board {
@@ -8,10 +9,8 @@ class Board {
 
     constructor(gridSize: Int, numberOfMines: Int) {
         this.grid = generateGrid(gridSize)
-            .apply {
-                generateMinePositions(this.keys, numberOfMines)
-                    .forEach { minePosition -> this[minePosition] = Cell(hasMine = true) }
-            }
+        generateMinePositions(grid.keys, numberOfMines)
+            .apply { addMines(this, grid) }
     }
 
     fun revealPosition(position: Position) = position
@@ -29,6 +28,12 @@ class Board {
         }
 
     companion object {
+        fun addMines(minePositions:Set<Position>, grid: MutableMap<Position, Cell>) =
+            minePositions.forEach { minePosition ->
+                grid[minePosition] = Cell(hasMine = true)
+                getNeighbours(minePosition, grid).values.forEach { it.mines++}
+            }
+
         fun isRevealed(
             position: Position,
             grid: Map<Position, Cell>
@@ -52,7 +57,8 @@ class Board {
             minesToPlace: Int
         ) = positions
             .shuffled()
-            .subList(0, minesToPlace) //TODO handle more mines that positions + negative minesToPlace
+            .subList(0, minesToPlace)
+            .toSet() //TODO handle more mines that positions + negative minesToPlace
 
         fun generateGrid(gridSize: Int): MutableMap<Position, Cell> {
             val cells = mutableMapOf<Position, Cell>()
@@ -79,7 +85,8 @@ enum class GameState {
 
 data class Cell(
     var revealed: Boolean = false,
-    val hasMine: Boolean = false)
+    val hasMine: Boolean = false,
+    var mines: Int = 0)
 
 data class Position(val x: Int, val y: Int) {
     override fun equals(other: Any?): Boolean {

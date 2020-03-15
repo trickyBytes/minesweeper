@@ -53,8 +53,116 @@ class MinesweeperApplicationTests {
 
     @Test
     fun canBuildAGridWithMines() {
-        val board = Board(gridSize = 5, numberOfMines = 2)
-        assertThat(board.grid.size).describedAs("Board Size").isEqualTo(25)
+        val board = Board(gridSize = 3, numberOfMines = 1)
+        assertThat(board.grid.size).describedAs("Board Size").isEqualTo(9)
+
+        board.grid.forEach {
+            log.debug("Position {}, Cell {}", it.key, it.value)
+        }
+    }
+
+    @Test
+    fun ifTopLeftCellHasMineNeighboursMineCountIsIncremented() {
+        val grid = Board.generateGrid(3)
+        val minePositions = setOf(Position(0, 0))
+
+        Board.addMines(minePositions, grid);
+
+        //Row 1
+        assertThat(grid[Position(0,0)]?.mines).isEqualTo(0) //Has Mine
+        assertThat(grid[Position(0,1)]?.mines).isEqualTo(1)
+        assertThat(grid[Position(0,2)]?.mines).isEqualTo(0)
+
+        //Row 2
+        assertThat(grid[Position(1,0)]?.mines).isEqualTo(1)
+        assertThat(grid[Position(1,1)]?.mines).isEqualTo(1)
+        assertThat(grid[Position(1,2)]?.mines).isEqualTo(0)
+
+        //Row 3
+        assertThat(grid[Position(2,0)]?.mines).isEqualTo(0)
+        assertThat(grid[Position(2,1)]?.mines).isEqualTo(0)
+        assertThat(grid[Position(2,2)]?.mines).isEqualTo(0)
+    }
+
+    @Test
+    fun ifTopRightCellHasMineNeighboursMineCountIsIncremented() {
+        val grid3x3 = Board.generateGrid(3)
+        Board.addMines(setOf(Position(0, 2)), grid3x3);
+        //Row 1
+        assertThat(grid3x3[Position(0,1)]?.mines).isEqualTo(1)
+        //Row 2
+        assertThat(grid3x3[Position(1,0)]?.mines).isEqualTo(0)
+        assertThat(grid3x3[Position(1,1)]?.mines).isEqualTo(1)
+        assertThat(grid3x3[Position(1,2)]?.mines).isEqualTo(1)
+        //Row 3
+        assertThat(grid3x3[Position(2,0)]?.mines).isEqualTo(0)
+
+        val grid5x5 = Board.generateGrid(5)
+        Board.addMines(setOf(Position(0, 4)), grid5x5);
+        //Row 1
+        assertThat(grid5x5[Position(0,3)]?.mines).isEqualTo(1)
+        //Row 2
+        assertThat(grid5x5[Position(1,2)]?.mines).isEqualTo(0)
+        assertThat(grid5x5[Position(1,3)]?.mines).isEqualTo(1)
+        assertThat(grid5x5[Position(1,4)]?.mines).isEqualTo(1)
+    }
+
+    @Test
+    fun ifACentralCellHasMineNeighboursMineCountIsIncremented() {
+        val grid5x5 = Board.generateGrid(5)
+        Board.addMines(setOf(Position(3, 2)), grid5x5);
+
+        //Row 2
+        assertThat(grid5x5[Position(2,1)]?.mines).isEqualTo(1)
+        assertThat(grid5x5[Position(2,2)]?.mines).isEqualTo(1)
+        assertThat(grid5x5[Position(2,3)]?.mines).isEqualTo(1)
+
+        //Row 3
+        assertThat(grid5x5[Position(3,1)]?.mines).isEqualTo(1)
+        assertThat(grid5x5[Position(3,2)]?.mines).isEqualTo(0) //Has Mine
+        assertThat(grid5x5[Position(3,3)]?.mines).isEqualTo(1)
+
+        //Row 4
+        assertThat(grid5x5[Position(4,1)]?.mines).isEqualTo(1)
+        assertThat(grid5x5[Position(4,2)]?.mines).isEqualTo(1)
+        assertThat(grid5x5[Position(4,3)]?.mines).isEqualTo(1)
+    }
+
+    @Test
+    fun aCentralAndBottomRightHaveMines() {
+        val grid5x5 = Board.generateGrid(5)
+        Board.addMines(setOf(Position(3, 2), Position(4, 4)), grid5x5);
+
+        //Row 3
+        assertThat(grid5x5[Position(3,3)]?.mines).isEqualTo(2)
+        assertThat(grid5x5[Position(3,4)]?.mines).isEqualTo(1)
+
+        //Row 4
+        assertThat(grid5x5[Position(4,3)]?.mines).isEqualTo(2)
+    }
+
+    @Test
+    fun adjacentCellsHaveMines() {
+        val grid5x5 = Board.generateGrid(5)
+        Board.addMines(setOf(Position(3, 2), Position(3, 3)), grid5x5);
+
+        //Row 2
+        assertThat(grid5x5[Position(2,1)]?.mines).isEqualTo(1)
+        assertThat(grid5x5[Position(2,2)]?.mines).isEqualTo(2)
+        assertThat(grid5x5[Position(2,3)]?.mines).isEqualTo(2)
+        assertThat(grid5x5[Position(2,4)]?.mines).isEqualTo(1)
+
+        //Row 3
+        assertThat(grid5x5[Position(3,1)]?.mines).isEqualTo(1)
+        assertThat(grid5x5[Position(3,2)]?.mines).isEqualTo(1) //mine
+        assertThat(grid5x5[Position(3,3)]?.mines).isEqualTo(0) //mine
+        assertThat(grid5x5[Position(3,4)]?.mines).isEqualTo(1)
+
+        //Row 4
+        assertThat(grid5x5[Position(4,1)]?.mines).isEqualTo(1)
+        assertThat(grid5x5[Position(4,2)]?.mines).isEqualTo(2)
+        assertThat(grid5x5[Position(4,3)]?.mines).isEqualTo(2)
+        assertThat(grid5x5[Position(4,4)]?.mines).isEqualTo(1)
     }
 
     @Test
